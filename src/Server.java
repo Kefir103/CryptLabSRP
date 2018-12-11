@@ -11,7 +11,7 @@ public class Server {
     int v;
     int A;
     int B;
-    int S;
+    long S;
     int b;
     int K;
     int M;
@@ -71,6 +71,10 @@ public class Server {
                     out.writeInt(main.B);
                     out.flush();
 
+                    System.out.println("b = " + main.b);
+                    out.writeInt(main.b);
+                    out.flush();
+
                     main.U = main.hash("" + main.A + main.B);
                     if (main.U == 0){
                         System.out.println("U == 0... Sorry, but I must close connection");
@@ -78,6 +82,11 @@ public class Server {
                     }
                     System.out.println("U = " + main.U);
 
+                    System.out.println("A = " + main.A +
+                            "\nv = " + main.v +
+                            "\nU = " + main.U +
+                            "\nN = " + main.N +
+                            "\nb = " + main.b);
                     main.S = main.setS(main.A, main.v, main.U, main.N, main.b);
                     System.out.println("S = " + main.S);
 
@@ -131,7 +140,7 @@ public class Server {
 
     void setB(int k, int g, int N, int v) throws IOException{
         Random random = new Random();
-        this.b = random.nextInt(255); // 1-байтное значение
+        this.b = random.nextInt(12); // 1-байтное значение
         int tmpKV = k * v;
         int tmpGBModN = 1;
         for (int i = 0; i < b; i++){
@@ -158,14 +167,14 @@ public class Server {
         return (int) hash;
     }
 
-    int setS(int A, int v, int U, int N, int b){
-        int tmpVU = 1;
+    long setS(int A, int v, int U, int N, int b){
+        long tmpVU = 1;
         for (int i = 0; i < U; i++){
             tmpVU *= v;
             tmpVU %= N;
         }
-        int tmpAVU = A * tmpVU;
-        int S = 1;
+        long tmpAVU = A * tmpVU;
+        long S = 1;
         for (int i = 0; i < b; i++){
             S *= tmpAVU;
             S %= N;
@@ -173,7 +182,7 @@ public class Server {
         return S;
     }
 
-    int setM(int S, int A, int B, int K){
+    int setM(long S, int A, int B, int K){
         int tmpHashN = hash("" + this.M);
         int tmpHashG = hash("" + this.g);
         int tmpHashI = hash(this.username);

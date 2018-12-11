@@ -21,13 +21,14 @@ public class Client {
     int k = 3; // Const
     int v; // v = g^x mod N
     int A, B;
+    int b;
     int a;
     int K;
     int R;
 
     int M;
 
-    int S;
+    long S;
 
     int X, U;
 
@@ -90,6 +91,9 @@ public class Client {
             main.B = input.readInt();
             main.checkB(main.B);
 
+            main.b = input.readInt();
+            System.out.println("b = " + main.b);
+
             main.U = main.hash("" + main.A + main.B);
             if (main.U == 0){
                 System.out.println("U == 0... Sorry, but I must close connection");
@@ -99,6 +103,13 @@ public class Client {
 
             main.X = main.hash(main.salt + main.password);
 
+            System.out.println("B = " + main.B +
+                    "\nk = " + main.k +
+                    "\ng = " + main.g +
+                    "\nx = " + main.X +
+                    "\na = " + main.a +
+                    "\nU = " + main.U +
+                    "\nN = " + main.N);
             main.S = main.setS(main.B, main.k, main.g, main.X, main.N, main.a, main.U);
             System.out.println("S = " + main.S);
 
@@ -143,16 +154,6 @@ public class Client {
         }
     }
 
-    private void checkPassword(BufferedReader consoleIn) throws IOException {
-        String str = consoleIn.readLine();
-
-        while (!str.equals(this.password)){
-            System.out.print("Authentication failed, please enter right password: ");
-            str = consoleIn.readLine();
-
-        }
-    }
-
     String saltGeneration(){
         int[] charCodes = new int[36];
         char c = '0';
@@ -194,7 +195,7 @@ public class Client {
 
     void setA(int N, int g) throws IOException{
         Random random = new Random();
-        this.a = random.nextInt(255); // 1-байтное значение
+        this.a = random.nextInt(12); // 1-байтное значение
         int rest = 1;
         for (int i = 0; i < a; i++){
             rest *= g;
@@ -217,24 +218,24 @@ public class Client {
         }
     }
 
-    int setS(int B, int k, int g, int x, int N, int a, int U){
-        int tmpGXmodN = 1;
+    long setS(int B, int k, int g, int x, int N, int a, int U){
+        long tmpGXmodN = 1;
         for (int i = 0; i < x; i++){
             tmpGXmodN *= g;
             tmpGXmodN %= N;
         }
-        int tmpBK = B - k * tmpGXmodN;
-        int tmpAUX = a + U * x;
-        int S = 1;
+        long tmpBK = B - k * tmpGXmodN;
+        long tmpAUX = a + U * x;
+        long S = 1;
+
         for (int i = 0; i < tmpAUX; i++){
             S *= tmpBK;
-            S %= N;
+            S = Math.floorMod(S, N);
         }
         return S;
     }
 
-    // Как же я задолбался...........
-    int setM(int S, int A, int B, int K){
+    int setM(long S, int A, int B, int K){
         int tmpHashN = hash("" + this.M);
         int tmpHashG = hash("" + this.g);
         int tmpHashI = hash(this.username);
